@@ -16,4 +16,11 @@ def login(user_credentials: schema.UserLogin, db: Session = Depends(Database.get
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Invalid Credentails"
             )
-    pass
+
+    if not utils.verify(user_credentials.password, user.password):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Invalid Credentails"
+        )
+
+    return {"test", "credentails matched"}
