@@ -1,21 +1,17 @@
 from fastapi import FastAPI, Response, status, HTTPException, Depends
 from fastapi.params import Body
-from pydantic import BaseModel
 from typing import Optional
 from random import randrange
 
 from sqlalchemy.orm import Session
-from . import models
+
+from . import models, schema
 from .Database import engine, get_db
+
 
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
-
-class Post(BaseModel):
-    title: str
-    content: str 
-    published: bool = True
 
 @app.get("/posts")
 def get_posts(db: Session = Depends(get_db)):
@@ -34,7 +30,7 @@ def get_post(id: int, response: Response, db: Session = Depends(get_db)):
     return {"data": post}
 
 @app.post("/posts", status_code=status.HTTP_201_CREATED)
-def create_post(post: Post, db: Session = Depends(get_db)):
+def create_post(post: schema.Post, db: Session = Depends(get_db)):
     new_post = models.Post(
         **post.dict()
         )
@@ -62,7 +58,7 @@ def delete_post(id:int, db: Session = Depends(get_db)):
 
 
 @app.put("/posts/{id}")
-def update_post(id:int, post: Post, db: Session = Depends(get_db)):
+def update_post(id:int, post: schema.Post, db: Session = Depends(get_db)):
     post_query = db.query(models.Post).filter(models.Post.id == id)
     my_post = post_query.first()
     if my_post is None:
