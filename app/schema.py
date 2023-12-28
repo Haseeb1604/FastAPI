@@ -13,3 +13,7 @@ class Post(_Base):
     created_At: datetime
     # class config:
     #     orm_mode = True
+
+class UserCreate(BaseModel):
+    email: str
+    password: str
