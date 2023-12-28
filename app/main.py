@@ -1,22 +1,25 @@
-from fastapi import FastAPI, Response, status, HTTPException
+from fastapi import FastAPI, Response, status, HTTPException, Depends
 from fastapi.params import Body
 from pydantic import BaseModel
 from typing import Optional
 from random import randrange
-import psycopg2
-from psycopg2.extras import RealDictCursor
+from . import model
 
+# import .
+
+from sqlalchemy.orm import Session
+from .Database import engine, SessionLocal
+
+model.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-try:
-    conn = psycopg2.connect(host="localhost", database="fastapi", user="postgre", password="postgre", cursor_factory=RealDictCursor)
-    cursor = conn.cursor()
-    print("Database Connection Successful")
-
-except Exception as error:
-    print("Connection to Database failed")
-    print("Error: ", error) 
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 class Post(BaseModel):
     title: str
@@ -36,6 +39,10 @@ my_posts = [
         "content": "Post Content 2"
     }
 ]
+
+@app.get("/sqlalchemy")
+def sql(db: Session = Depends(get_db) ):
+    pass
  
 @app.get("/")
 def index():
