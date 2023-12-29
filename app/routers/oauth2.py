@@ -1,6 +1,7 @@
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from .. import schema, Database, models
+from ..config import settings
 from fastapi import Depends, status, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
@@ -11,9 +12,9 @@ oauth2_Schema = OAuth2PasswordBearer(tokenUrl="login")
 # Algorithm
 # Expiration Time
 
-SECRET_KEY = "e2bae742d67b31027d9313a4b7a40b320ef682222ddc80e3c82e1cc0ef0e4ea65eee5bcccfbf7965e1b957f8039b3f184a75407bfef9a8ff58fae61bdd2111de4c95d6e600b82285a0333edd7382d479"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRES_MINUTES = 60
+SECRET_KEY = settings.SECRET_KEY
+ALGORITHM = settings.ALGORITHM
+ACCESS_TOKEN_EXPIRES_MINUTES = settings.ACCESS_TOKEN_EXPIRES_MINUTES
 
 def create_access_token(data: dict):
     to_encode = data.copy()
