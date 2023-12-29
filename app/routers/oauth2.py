@@ -19,7 +19,7 @@ def create_access_token(data: dict):
     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRES_MINUTES)
     to_encode.update({"exp": expire})
 
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=[ALGORITHM])
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
     return encoded_jwt
 
@@ -32,7 +32,8 @@ def verify_access_token(token: str, credentails_exception):
         if id is None:
             raise credentails_exception
 
-        token_data = schema.TokenData(id)
+        token_data = schema.TokenData()
+        token_data.id = id
     except JWTError:
         raise credentails_exception
     
