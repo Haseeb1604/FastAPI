@@ -14,9 +14,11 @@ router = APIRouter(
 @router.get("/", response_model=List[schema.Post])
 def get_posts(
     db: Session = Depends(get_db),
-    user_id: int = Depends(oauth2.get_current_user)
+    current_user: int = Depends(oauth2.get_current_user),
+    limit: int = 10,
+    skip: int = 0
     ):
-    posts = db.query(models.Post).all()
+    posts = db.query(models.Post).limit(limit).offset(skip).all()
     return posts
 
 @router.get("/{id}", response_model=schema.Post)
@@ -26,12 +28,17 @@ def get_post(
     current_user: int = Depends(oauth2.get_current_user)
     ):
 
-    print(current_user.email)
     post = db.query(models.Post).filter(models.Post.id == id).first()
     if not post:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail= f"Post with id {id} not found"
+            )
+
+    if post.owner_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail= f"Not autherized to perfrom requested operation"
             )
 
     return post
@@ -44,6 +51,7 @@ def create_post(
     ):
     
     new_post = models.Post(
+        owner_id=current_user.id,
         **post.dict()
         )
     
@@ -66,6 +74,12 @@ def delete_post(
             status_code=status.HTTP_404_NOT_FOUND,
             detail= f"Post with id {id} not found"
             )
+
+    if post.first().owner_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail= f"Not autherized to perfrom requested operation"
+            )
     
     post.delete(synchronize_session=False)
     db.commit()
@@ -81,12 +95,19 @@ def update_post(
     
     post_query = db.query(models.Post).filter(models.Post.id == id)
     my_post = post_query.first()
+
     if my_post is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail= f"Post with id {id} not found"
             )
-    
+
+    if my_post.owner_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail= f"Not autherized to perfrom requested operation"
+            )
+
     post_query.update(post.dict(), synchronize_session=False)
     db.commit()
     return post_query.first()
