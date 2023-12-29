@@ -1,4 +1,5 @@
-from passlib.context import CryptContext
+import os 
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+path = os.getenv("path")
 
+print(path)
