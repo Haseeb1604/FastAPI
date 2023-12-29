@@ -23,8 +23,10 @@ def get_posts(
 def get_post(
     id: int, response: Response, 
     db: Session = Depends(get_db),
-    user_id: int = Depends(oauth2.get_current_user)
+    current_user: int = Depends(oauth2.get_current_user)
     ):
+
+    print(current_user.email)
     post = db.query(models.Post).filter(models.Post.id == id).first()
     if not post:
         raise HTTPException(
@@ -38,7 +40,7 @@ def get_post(
 def create_post(
     post: schema.PostCreate, 
     db: Session = Depends(get_db),
-    user_id: int = Depends(oauth2.get_current_user)
+    current_user: int = Depends(oauth2.get_current_user)
     ):
     
     new_post = models.Post(
@@ -55,7 +57,8 @@ def create_post(
 def delete_post(
     id:int, 
     db: Session = Depends(get_db),
-    user_id: int = Depends(oauth2.get_current_user)):
+    current_user: int = Depends(oauth2.get_current_user)):
+    
     post = db.query(models.Post).filter(models.Post.id == id)
 
     if post.first() is None:
@@ -74,7 +77,8 @@ def delete_post(
 def update_post(
     id:int, post: schema.PostCreate, 
     db: Session = Depends(get_db),
-    user_id: int = Depends(oauth2.get_current_user)):
+    current_user: int = Depends(oauth2.get_current_user)):
+    
     post_query = db.query(models.Post).filter(models.Post.id == id)
     my_post = post_query.first()
     if my_post is None:
