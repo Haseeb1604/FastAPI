@@ -10,7 +10,9 @@ from .config import settings
 
 app = FastAPI()
 
-origins = ["www.google.com"]
+origins = [
+    "https://www.google.com",
+    "https://alembic.sqlalchemy.org/"]
 
 app.add_middleware(
     CORSMiddleware,
@@ -24,3 +26,7 @@ app.include_router(auth.router)
 app.include_router(user.router)
 app.include_router(post.router)
 app.include_router(votes.router)
+
+@app.get("/")
+def read_items():
+    return {"data": "Hello World"}
