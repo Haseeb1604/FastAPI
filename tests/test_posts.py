@@ -46,7 +46,6 @@ def test_create_posts_published_default(authorized_client, test_user, test_posts
         "title": "abc",
         "content": "content"})
 
-    # created_post = schema.Post(**res.json())
     assert res.status_code == 201
 
 def test_unautherized_create_posts(client, test_posts):
@@ -57,3 +56,19 @@ def test_unautherized_create_posts(client, test_posts):
     })
 
     assert res.status_code == 401
+
+def test_unautherized_delete_posts(client, test_posts):
+    res = client.delete(f"/posts/{test_posts[0].id}")
+    assert res.status_code == 401
+
+def test_autherized_delete_posts(authorized_client, test_posts):
+    res = authorized_client.delete(f"/posts/{test_posts[0].id}")
+    assert res.status_code == 204
+
+def test_delete_posts_not_exist(authorized_client, test_posts):
+    res = authorized_client.delete("/posts/9999999")
+    assert res.status_code == 404
+
+def test_delete_other_user_posts(authorized_client, test_posts):
+    res = authorized_client.delete(f"/posts/{test_posts[3].id}")
+    assert res.status_code == 403
