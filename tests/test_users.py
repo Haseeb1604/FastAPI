@@ -1,28 +1,9 @@
 import pytest
 from jose import jwt
 from app import schema
-from .database import client, session
+# from .database import client, session
 from app.config import settings
 
-@pytest.fixture
-def test_user(client):
-    user_data = {
-        "email": "abc@gmail.com",
-        "password": "1234"
-    }
-
-    res = client.post("/users/", json=user_data)
-    print(res.json())
-    new_user = res.json()
-    new_user["password"] = user_data["password"]
-    assert res.status_code == 201
-    return new_user
-
-# def test_root(client):
-#     res = client.get("/")
-#     print(res.json())
-#     assert res.json().get("data") == "Hello World"
-#     assert res.status_code == 200
 
 def test_user_create(client):
     res = client.post(
