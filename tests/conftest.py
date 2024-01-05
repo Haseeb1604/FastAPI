@@ -10,7 +10,7 @@ from sqlalchemy.orm import sessionmaker
 from app.config import settings
 from app.Database import get_db
 from app.Database import Base
-from app.models import Post
+from app import models
 from app.routers.oauth2 import create_access_token
 
 SQLALCHEMY_DATABASE_URL = f"postgresql://{settings.DATABASE_USERNAME}:{settings.DATABASE_PASSWORD}@{settings.DATABASE_HOSTNAME}:{settings.DATABASE_PORT}/{settings.DATABASE_NAME}_test"
@@ -46,6 +46,19 @@ def client(session):
 def test_user(client):
     user_data = {
         "email": "abc@gmail.com",
+        "password": "1234"
+    }
+
+    res = client.post("/users/", json=user_data)
+    new_user = res.json()
+    new_user["password"] = user_data["password"]
+    assert res.status_code == 201
+    return new_user
+
+@pytest.fixture
+def test_user2(client):
+    user_data = {
+        "email": "abc2@gmail.com",
         "password": "1234"
     }
 
