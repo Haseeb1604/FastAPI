@@ -28,9 +28,6 @@ class Post(_Base):
     id: int
     created_At: datetime
     owner: UserOut
-    # class config:
-    #     orm_mode = True
-
 class Token(BaseModel):
     access_token: str
     token_type: str
