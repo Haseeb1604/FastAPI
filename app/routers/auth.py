@@ -22,7 +22,7 @@ def login(
     if not user:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=f"Invalid Credentails Email"
+            detail=f"Invalid Credentails"
             )
 
     if not utils.verify(user_credentials.password, user.password):
